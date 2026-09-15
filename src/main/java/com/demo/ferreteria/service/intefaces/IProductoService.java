@@ -1,4 +1,4 @@
-package com.demo.ferreteria.service;
+package com.demo.ferreteria.service.intefaces;
 
 import com.demo.ferreteria.model.Categoria;
 import com.demo.ferreteria.model.Producto;
