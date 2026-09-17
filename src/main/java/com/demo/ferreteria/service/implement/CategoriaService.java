@@ -1,5 +1,6 @@
 package com.demo.ferreteria.service.implement;
 
+import com.demo.ferreteria.dto.CategoriaDTO;
 import com.demo.ferreteria.model.Categoria;
 import com.demo.ferreteria.repository.ICategoriaRepository;
 import com.demo.ferreteria.service.intefaces.ICategoriaService;
@@ -17,39 +18,90 @@ import java.util.concurrent.CompletableFuture;
 public class CategoriaService implements ICategoriaService {
     private final ICategoriaRepository repository;
 
-
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     @Async
-    public CompletableFuture<Categoria> crearAsync(Categoria entity) {
-        return null;
+    public CompletableFuture<CategoriaDTO> crearAsync(CategoriaDTO dto) {
+        Categoria categoria = new Categoria();
+        categoria.setNombre(dto.nombre());
+        categoria.setDescripcion(dto.descripcion());
+        categoria.setEstado(dto.estado());
+
+        Categoria guardado = repository.save(categoria);
+
+        CategoriaDTO resultado = new CategoriaDTO(
+                guardado.getIdCategoria(),
+                guardado.getNombre(),
+                guardado.getDescripcion(),
+                guardado.getEstado()
+        );
+
+        return CompletableFuture.completedFuture(resultado);
     }
 
     @Override
     @Transactional(readOnly = true)
     @Async
-    public CompletableFuture<Categoria> obtenerPorIdAsync(Long aLong) {
-        return null;
+    public CompletableFuture<CategoriaDTO> obtenerPorIdAsync(Long aLong) {
+        Categoria categoria = repository.findById(aLong)
+                .orElseThrow(()->new EntityNotFoundException("Categoria no encontrada"));
+
+        CategoriaDTO resultado = new CategoriaDTO(
+                categoria.getIdCategoria(),
+                categoria.getNombre(),
+                categoria.getDescripcion(),
+                categoria.getEstado()
+        );
+        return CompletableFuture.completedFuture(resultado);
     }
 
     @Override
     @Transactional(readOnly = true)
     @Async
-    public CompletableFuture<List<Categoria>> listarTodosAsync() {
-        return null;
+    public CompletableFuture<List<CategoriaDTO>> listarTodosAsync() {
+        return CompletableFuture.completedFuture(
+                repository.findAll()
+                        .stream()
+                        .map(p->new CategoriaDTO(
+                                p.getIdCategoria(),
+                                p.getNombre(),
+                                p.getDescripcion(),
+                                p.getEstado()
+                        )).toList()
+        );
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     @Async
-    public CompletableFuture<Categoria> actualizarAsync(Long aLong, Categoria entity) {
-        return null;
+    public CompletableFuture<CategoriaDTO> actualizarAsync(Long aLong, CategoriaDTO dto) {
+        Categoria categoria = repository.findById(aLong)
+                .orElseThrow(()->new EntityNotFoundException("Categoria no encontrada"));
+
+        //Actualizamos los campos
+        categoria.setNombre(dto.nombre());
+        categoria.setDescripcion(dto.descripcion());
+        categoria.setEstado(dto.estado());
+
+        Categoria actualizado = repository.save(categoria);
+
+        CategoriaDTO resultado = new CategoriaDTO(
+                actualizado.getIdCategoria(),
+                actualizado.getNombre(),
+                actualizado.getDescripcion(),
+                actualizado.getEstado()
+        );
+            return CompletableFuture.completedFuture(resultado);
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     @Async
     public CompletableFuture<Boolean> eliminarAsync(Long aLong) {
-        return null;
+        if(!repository.existsById(aLong))
+            throw new EntityNotFoundException("Categoria no encontrada");
+
+        repository.deleteById(aLong);
+        return  CompletableFuture.completedFuture(true);
     }
 }

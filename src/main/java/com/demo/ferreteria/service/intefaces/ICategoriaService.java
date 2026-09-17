@@ -1,6 +1,6 @@
 package com.demo.ferreteria.service.intefaces;
 
-import com.demo.ferreteria.model.Categoria;
+import com.demo.ferreteria.dto.CategoriaDTO;
 
-public interface ICategoriaService extends IGenericService<Categoria, Long>{
+public interface ICategoriaService extends IGenericService<CategoriaDTO, Long>{
 }
